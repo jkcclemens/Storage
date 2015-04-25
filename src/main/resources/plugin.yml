@@ -1,0 +1,9 @@
+name: Storage
+version: ${pluginversion}
+main: org.royaldev.storage.StoragePlugin
+author: jkcclemens
+description: Creates a universal, infinite storage via commands.
+
+reflectcommands:
+  - commands.impl.store.StoreCommand
+  - commands.impl.retrieve.RetrieveCommand
