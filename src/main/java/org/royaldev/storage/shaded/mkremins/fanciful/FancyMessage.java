@@ -75,8 +75,12 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
 
         if (nmsPacketPlayOutChatConstructor == null) {
             try {
-                nmsPacketPlayOutChatConstructor = Reflection.getNMSClass("PacketPlayOutChat").getDeclaredConstructor(Reflection.getNMSClass("IChatBaseComponent"));
-                nmsPacketPlayOutChatConstructor.setAccessible(true);
+                final Class<?> packetPlayOutChat = Reflection.getNMSClass("PacketPlayOutChat");
+                final Class<?> chatBaseComponent = Reflection.getNMSClass("IChatBaseComponent");
+                if (packetPlayOutChat != null && chatBaseComponent != null) {
+                    nmsPacketPlayOutChatConstructor = packetPlayOutChat.getDeclaredConstructor(chatBaseComponent);
+                    nmsPacketPlayOutChatConstructor.setAccessible(true);
+                }
             } catch (NoSuchMethodException e) {
                 Bukkit.getLogger().log(Level.SEVERE, "Could not find Minecraft method or constructor.", e);
             } catch (SecurityException e) {
@@ -243,8 +247,15 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
         Player player = (Player) sender;
         try {
             Object handle = Reflection.getHandle(player);
-            Object connection = Reflection.getField(handle.getClass(), "playerConnection").get(handle);
-            Reflection.getMethod(connection.getClass(), "sendPacket", Reflection.getNMSClass("Packet")).invoke(connection, createChatPacket(jsonString));
+            if (handle == null) return;
+            final Field playerConnection = Reflection.getField(handle.getClass(), "playerConnection");
+            if (playerConnection == null) return;
+            Object connection = playerConnection.get(handle);
+            final Class<?> packet = Reflection.getNMSClass("Packet");
+            if (packet == null) return;
+            final Method sendPacket = Reflection.getMethod(connection.getClass(), "sendPacket", packet);
+            if (sendPacket == null) return;
+            sendPacket.invoke(connection, createChatPacket(jsonString));
         } catch (IllegalArgumentException e) {
             Bukkit.getLogger().log(Level.WARNING, "Argument could not be passed.", e);
         } catch (IllegalAccessException e) {
@@ -449,10 +460,20 @@ public class FancyMessage implements JsonRepresentedObject, Cloneable, Iterable<
      */
     public FancyMessage itemTooltip(final ItemStack itemStack) {
         try {
-            Object nmsItem = Reflection.getMethod(Reflection.getOBCClass("inventory.CraftItemStack"), "asNMSCopy", ItemStack.class).invoke(null, itemStack);
-            return itemTooltip(Reflection.getMethod(Reflection.getNMSClass("ItemStack"), "save", Reflection.getNMSClass("NBTTagCompound")).invoke(nmsItem, Reflection.getNMSClass("NBTTagCompound").newInstance()).toString());
+            final Class<?> craftItemStack = Reflection.getOBCClass("inventory.CraftItemStack");
+            final Class<?> itemStackClass = Reflection.getNMSClass("ItemStack");
+            final Class<?> nbtTagCompound = Reflection.getNMSClass("NBTTagCompound");
+            if (craftItemStack != null && itemStackClass != null && nbtTagCompound != null) {
+                final Method asNMSCopy = Reflection.getMethod(craftItemStack, "asNMSCopy", ItemStack.class);
+                final Method save = Reflection.getMethod(itemStackClass, "save", nbtTagCompound);
+                if (asNMSCopy != null && save != null) {
+                    Object nmsItem = asNMSCopy.invoke(null, itemStack);
+                    return itemTooltip(save.invoke(nmsItem, nbtTagCompound.newInstance()).toString());
+                }
+            }
+            return this;
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return this;
         }
     }

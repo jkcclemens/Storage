@@ -71,7 +71,7 @@ public final class Reflection {
             return field;
         } catch (Exception e) {
             // Error loading
-            e.printStackTrace();
+//            e.printStackTrace();
             // Cache field as not existing
             loaded.put(name, null);
             return null;
@@ -91,7 +91,7 @@ public final class Reflection {
         try {
             return getMethod(obj.getClass(), "getHandle").invoke(obj);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return null;
         }
     }
@@ -161,7 +161,7 @@ public final class Reflection {
         try {
             clazz = Class.forName(fullName);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             _loadedNMSClasses.put(className, null);
             return null;
         }
@@ -186,7 +186,7 @@ public final class Reflection {
         try {
             clazz = Class.forName(fullName);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             _loadedOBCClasses.put(className, null);
             return null;
         }
