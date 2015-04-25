@@ -50,7 +50,7 @@ public class FilterPrompt extends NumericPrompt implements StoragePrompt {
     @Override
     public String getPromptText(final ConversationContext context) {
         context.getForWhom().sendRawMessage(ChatColor.BLUE + "There is more than one item with that type in your storage. Which do you want?");
-        context.getForWhom().sendRawMessage("Hover over each item to see its description.");
+        context.getForWhom().sendRawMessage(ChatColor.GRAY + "Hover over each item to see its description.");
         this.sendItems(context);
         return ChatColor.GRAY + "Type the number of the item you want.";
     }
