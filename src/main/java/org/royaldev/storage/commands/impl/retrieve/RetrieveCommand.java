@@ -33,6 +33,7 @@ public class RetrieveCommand extends BaseCommand<StoragePlugin> {
             .withLocalEcho(false)
             .withModality(false)
             .withEscapeSequence("stop")
+            .withEscapeSequence("cancel")
             .withFirstPrompt(new MaterialPrompt())
             .buildConversation(p);
         c.getContext().setSessionData("storage", this.plugin.getStorages().getStorageOrAdd(
